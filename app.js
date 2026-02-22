@@ -125,6 +125,7 @@
     APP.dom.errorBar     = $('error-bar');
     APP.dom.prayerGrid   = $('prayer-grid');
     APP.dom.clockDisplay = $('clock-display');
+    APP.dom.dashboard    = $('dashboard');
   }
 
   /* --------------------------------------------------------
@@ -413,6 +414,10 @@
 
     // Body class
     document.body.className = APP.state.theme;
+
+    // Dashboard border glow
+    APP.dom.dashboard.style.borderColor = dim;
+    APP.dom.dashboard.style.boxShadow = '0 0 12px ' + dim + ', inset 0 0 12px ' + t.bg;
 
     // Clock glow
     var shadow = '0 0 10px ' + glow + ', 0 0 30px ' + dim + ', 0 0 60px ' + dim;
