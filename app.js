@@ -15,9 +15,14 @@
      THEME COLOUR MAPS (no CSS variables — Chrome 44 compat)
      -------------------------------------------------------- */
   APP.themes = {
-    'theme-cyan':  { glow: '#00ffff', dim: '#007a7a', bg: 'rgba(0,255,255,0.06)', accent: '#00cccc' },
-    'theme-green': { glow: '#39ff14', dim: '#1a7a0a', bg: 'rgba(57,255,20,0.06)',  accent: '#2ecc40' },
-    'theme-amber': { glow: '#ffbf00', dim: '#7a5c00', bg: 'rgba(255,191,0,0.06)',  accent: '#e6ac00' }
+    'theme-cyan':    { glow: '#00ffff', dim: '#007a7a', bg: 'rgba(0,255,255,0.06)',   accent: '#00cccc' },
+    'theme-green':   { glow: '#39ff14', dim: '#1a7a0a', bg: 'rgba(57,255,20,0.06)',   accent: '#2ecc40' },
+    'theme-amber':   { glow: '#ffbf00', dim: '#7a5c00', bg: 'rgba(255,191,0,0.06)',   accent: '#e6ac00' },
+    'theme-red':     { glow: '#ff3333', dim: '#7a1a1a', bg: 'rgba(255,51,51,0.06)',   accent: '#cc2a2a' },
+    'theme-magenta': { glow: '#ff00ff', dim: '#7a007a', bg: 'rgba(255,0,255,0.06)',   accent: '#cc00cc' },
+    'theme-violet':  { glow: '#bf7fff', dim: '#5c3d7a', bg: 'rgba(191,127,255,0.06)', accent: '#a066e6' },
+    'theme-blue':    { glow: '#4d88ff', dim: '#264080', bg: 'rgba(77,136,255,0.06)',   accent: '#3d6fcc' },
+    'theme-white':   { glow: '#e8e8e8', dim: '#606060', bg: 'rgba(232,232,232,0.06)', accent: '#c0c0c0' }
   };
 
   /* --------------------------------------------------------
