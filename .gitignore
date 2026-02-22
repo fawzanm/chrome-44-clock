@@ -1,0 +1,27 @@
+/node_modules
+/public/hot
+/storage/*.key
+/vendor
+.env
+.env.backup
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/storage/debugbar
+public/theme/custom/video/
+.idea/
+public/accounts
+public/account
+public/experiences
+public/storage
+public/uploads
+ivx-theme.json
+.env.testing
+public/build/
+.phpunit.cache/
+
+# Compare script dumps
+storage/compare_dumps/
+.claude

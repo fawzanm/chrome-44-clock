@@ -1,0 +1,387 @@
+/* ============================================================
+   Retro Digital Dashboard — styles.css
+   Compatible with Chrome 44 / Android WebView
+   ============================================================ */
+
+/* --- Reset & Base --- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: #0a0a0f;
+  color: #ccc;
+  font-family: "Courier New", Courier, "Lucida Console", monospace;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Theme colour variables via classes --- */
+/* Cyan (default) */
+.theme-cyan { --glow: #00ffff; --glow-dim: #007a7a; --glow-bg: rgba(0,255,255,0.06); --accent: #00cccc; }
+/* Green */
+.theme-green { --glow: #39ff14; --glow-dim: #1a7a0a; --glow-bg: rgba(57,255,20,0.06); --accent: #2ecc40; }
+/* Amber */
+.theme-amber { --glow: #ffbf00; --glow-dim: #7a5c00; --glow-bg: rgba(255,191,0,0.06); --accent: #e6ac00; }
+
+/* Fallback for browsers that don't support CSS variables (Chrome 44 does NOT). */
+/* We duplicate key colour values in JS-injected style overrides. See app.js applyThemeColors(). */
+
+/* --- Scanlines overlay --- */
+.scanlines {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.15) 0px,
+    rgba(0,0,0,0.15) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* --- Vignette overlay --- */
+.vignette {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 9997;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.65) 100%);
+}
+
+/* --- Utility --- */
+.hidden {
+  display: none !important;
+}
+
+/* --- Dashboard layout --- */
+#dashboard {
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 18px 16px 30px;
+  text-align: center;
+}
+
+/* ============================================================
+   CLOCK
+   ============================================================ */
+#clock-section {
+  padding: 10px 0 6px;
+}
+
+#clock-display {
+  font-size: 80px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  line-height: 1;
+  /* glow set by JS */
+}
+
+#clock-seconds-wrap {
+  font-size: 40px;
+  vertical-align: top;
+  position: relative;
+  top: 6px;
+}
+
+#clock-ampm {
+  font-size: 22px;
+  vertical-align: top;
+  position: relative;
+  top: 10px;
+  margin-left: 6px;
+  opacity: 0.7;
+}
+
+.colon {
+  position: relative;
+}
+.colon-off {
+  visibility: hidden;
+}
+
+#clock-date {
+  font-size: 16px;
+  letter-spacing: 3px;
+  margin-top: 6px;
+  opacity: 0.7;
+}
+
+/* ============================================================
+   NEXT PRAYER BANNER
+   ============================================================ */
+#next-prayer-banner {
+  margin: 14px auto 12px;
+  padding: 10px 18px;
+  border: 1px solid;
+  border-radius: 4px;
+  display: inline-block;
+  min-width: 320px;
+  font-size: 20px;
+  letter-spacing: 2px;
+  /* colours set by JS */
+}
+
+#next-prayer-label {
+  margin-right: 14px;
+}
+
+#next-prayer-countdown {
+  font-weight: bold;
+  font-size: 26px;
+}
+
+/* ============================================================
+   PRAYER GRID
+   ============================================================ */
+#prayer-grid {
+  margin: 10px auto 16px;
+  max-width: 640px;
+  /* clearfix */
+  overflow: hidden;
+}
+
+.prayer-card {
+  float: left;
+  width: 33.333%;
+  padding: 8px 6px;
+}
+
+.prayer-card-inner {
+  /* not used — keeping flat */
+}
+
+.prayer-name {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 2px;
+  opacity: 0.6;
+  margin-bottom: 2px;
+}
+
+.prayer-time {
+  display: block;
+  font-size: 26px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.prayer-card.active {
+  /* highlight set by JS */
+  opacity: 1;
+}
+
+.prayer-card.active .prayer-name {
+  opacity: 1;
+}
+
+.prayer-card.passed .prayer-time {
+  opacity: 0.3;
+}
+.prayer-card.passed .prayer-name {
+  opacity: 0.3;
+}
+
+/* ============================================================
+   STOPWATCH
+   ============================================================ */
+#stopwatch-section {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+#stopwatch-panel {
+  margin-top: 10px;
+}
+
+#stopwatch-display {
+  font-size: 42px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+#stopwatch-ms {
+  font-size: 22px;
+  opacity: 0.5;
+}
+
+#stopwatch-controls {
+  margin-bottom: 8px;
+}
+
+#stopwatch-controls .btn {
+  margin: 0 4px;
+}
+
+#lap-list {
+  max-height: 120px;
+  overflow-y: auto;
+  font-size: 13px;
+  opacity: 0.7;
+  text-align: left;
+  max-width: 280px;
+  margin: 4px auto 0;
+}
+
+.lap-entry {
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: inherit;
+  font-family: inherit;
+  font-size: 13px;
+  letter-spacing: 2px;
+  padding: 7px 16px;
+  cursor: pointer;
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.btn:active {
+  background: rgba(255,255,255,0.14);
+}
+
+/* Settings gear button */
+.settings-gear {
+  position: fixed;
+  bottom: 14px;
+  right: 14px;
+  z-index: 100;
+  font-size: 12px;
+}
+
+/* ============================================================
+   SETTINGS MODAL
+   ============================================================ */
+#settings-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 10000;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+
+#settings-modal {
+  background: #111118;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  padding: 24px 28px;
+  width: 340px;
+  max-width: 92vw;
+  max-height: 88vh;
+  overflow-y: auto;
+}
+
+#settings-modal h2 {
+  font-size: 18px;
+  letter-spacing: 4px;
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.setting-row {
+  margin-bottom: 14px;
+}
+
+.setting-row label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+  opacity: 0.6;
+}
+
+.setting-row select {
+  width: 100%;
+  padding: 6px 8px;
+  background: #1a1a24;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #ccc;
+  font-family: inherit;
+  font-size: 13px;
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: menulist;
+}
+
+.setting-actions {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* ============================================================
+   ERROR BAR
+   ============================================================ */
+#error-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #330000;
+  color: #ff4444;
+  font-size: 12px;
+  padding: 6px 12px;
+  z-index: 10001;
+  text-align: center;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media screen and (max-width: 480px) {
+  #clock-display {
+    font-size: 52px;
+  }
+  #clock-seconds-wrap {
+    font-size: 26px;
+    top: 4px;
+  }
+  #clock-ampm {
+    font-size: 16px;
+  }
+  .prayer-card {
+    width: 50%;
+  }
+  #next-prayer-banner {
+    min-width: 0;
+    font-size: 16px;
+    padding: 8px 12px;
+  }
+  #next-prayer-countdown {
+    font-size: 20px;
+  }
+  #stopwatch-display {
+    font-size: 32px;
+  }
+}
+
+@media screen and (min-width: 800px) {
+  #clock-display {
+    font-size: 110px;
+  }
+  #clock-seconds-wrap {
+    font-size: 52px;
+  }
+}

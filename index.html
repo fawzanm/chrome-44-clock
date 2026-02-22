@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Retro Dashboard</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-cyan">
+
+<!-- Scanline overlay -->
+<div class="scanlines"></div>
+<!-- Vignette overlay -->
+<div class="vignette"></div>
+
+<!-- Main dashboard -->
+<div id="dashboard">
+
+  <!-- Clock Section -->
+  <div id="clock-section">
+    <div id="clock-display">
+      <span id="clock-hours">00</span><span id="clock-colon1" class="colon">:</span><span id="clock-minutes">00</span><span id="clock-seconds-wrap"><span id="clock-colon2" class="colon">:</span><span id="clock-seconds">00</span></span><span id="clock-ampm"></span>
+    </div>
+    <div id="clock-date">---</div>
+  </div>
+
+  <!-- Next Prayer Banner -->
+  <div id="next-prayer-banner">
+    <span id="next-prayer-label">NEXT: ---</span>
+    <span id="next-prayer-countdown">--:--:--</span>
+  </div>
+
+  <!-- Prayer Times Grid -->
+  <div id="prayer-grid">
+    <div class="prayer-card" data-prayer="fajr">
+      <span class="prayer-name">FAJR</span>
+      <span class="prayer-time" id="pt-fajr">--:--</span>
+    </div>
+    <div class="prayer-card" data-prayer="sunrise">
+      <span class="prayer-name">SUNRISE</span>
+      <span class="prayer-time" id="pt-sunrise">--:--</span>
+    </div>
+    <div class="prayer-card" data-prayer="dhuhr">
+      <span class="prayer-name">DHUHR</span>
+      <span class="prayer-time" id="pt-dhuhr">--:--</span>
+    </div>
+    <div class="prayer-card" data-prayer="asr">
+      <span class="prayer-name">ASR</span>
+      <span class="prayer-time" id="pt-asr">--:--</span>
+    </div>
+    <div class="prayer-card" data-prayer="maghrib">
+      <span class="prayer-name">MAGHRIB</span>
+      <span class="prayer-time" id="pt-maghrib">--:--</span>
+    </div>
+    <div class="prayer-card" data-prayer="isha">
+      <span class="prayer-name">ISHA</span>
+      <span class="prayer-time" id="pt-isha">--:--</span>
+    </div>
+  </div>
+
+  <!-- Stopwatch Toggle -->
+  <div id="stopwatch-section">
+    <button id="stopwatch-toggle" class="btn">STOPWATCH</button>
+    <div id="stopwatch-panel" class="hidden">
+      <div id="stopwatch-display">00:00:00<span id="stopwatch-ms">.000</span></div>
+      <div id="stopwatch-controls">
+        <button id="sw-start" class="btn">START</button>
+        <button id="sw-reset" class="btn">RESET</button>
+        <button id="sw-lap" class="btn">LAP</button>
+      </div>
+      <div id="lap-list"></div>
+    </div>
+  </div>
+
+  <!-- Settings Button -->
+  <button id="settings-btn" class="btn settings-gear">SETTINGS</button>
+</div>
+
+<!-- Settings Modal -->
+<div id="settings-overlay" class="hidden">
+  <div id="settings-modal">
+    <h2>SETTINGS</h2>
+
+    <div class="setting-row">
+      <label>THEME</label>
+      <select id="set-theme">
+        <option value="theme-cyan">Cyan</option>
+        <option value="theme-green">Green</option>
+        <option value="theme-amber">Amber</option>
+      </select>
+    </div>
+
+    <div class="setting-row">
+      <label>TIME FORMAT</label>
+      <select id="set-format">
+        <option value="24">24 Hour</option>
+        <option value="12">12 Hour</option>
+      </select>
+    </div>
+
+    <div class="setting-row">
+      <label>SHOW SECONDS</label>
+      <select id="set-seconds">
+        <option value="1">Yes</option>
+        <option value="0">No</option>
+      </select>
+    </div>
+
+    <div class="setting-row">
+      <label>PRAYER METHOD</label>
+      <select id="set-method">
+        <option value="dubai">Dubai (GIAE)</option>
+        <option value="mwl">Muslim World League</option>
+        <option value="isna">ISNA (North America)</option>
+        <option value="egypt">Egyptian Authority</option>
+        <option value="karachi">Karachi (Hanafi)</option>
+      </select>
+    </div>
+
+    <div class="setting-row">
+      <label>ASR CALCULATION</label>
+      <select id="set-asr">
+        <option value="standard">Standard (Shafi'i)</option>
+        <option value="hanafi">Hanafi</option>
+      </select>
+    </div>
+
+    <div class="setting-actions">
+      <button id="settings-close" class="btn">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- Error bar -->
+<div id="error-bar" class="hidden"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
