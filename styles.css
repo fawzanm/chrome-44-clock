@@ -73,12 +73,20 @@ body {
 #dashboard {
   position: relative;
   z-index: 1;
-  width: 92vw;
-  max-width: 960px;
-  padding: 24px 32px 28px;
+  width: calc(100vw - 8px);
+  height: calc(100vh - 8px);
+  padding: 20px 32px;
   text-align: center;
   border: 1px solid;
-  border-radius: 8px;
+  border-radius: 6px;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
   /* border colour + glow set by JS via applyThemeColors */
 }
 
@@ -90,26 +98,26 @@ body {
 }
 
 #clock-display {
-  font-size: 80px;
+  font-size: 140px;
   font-weight: bold;
-  letter-spacing: 4px;
+  letter-spacing: 6px;
   line-height: 1;
   /* glow set by JS */
 }
 
 #clock-seconds-wrap {
-  font-size: 40px;
-  vertical-align: top;
-  position: relative;
-  top: 6px;
-}
-
-#clock-ampm {
-  font-size: 22px;
+  font-size: 64px;
   vertical-align: top;
   position: relative;
   top: 10px;
-  margin-left: 6px;
+}
+
+#clock-ampm {
+  font-size: 32px;
+  vertical-align: top;
+  position: relative;
+  top: 16px;
+  margin-left: 8px;
   opacity: 0.7;
 }
 
@@ -121,9 +129,9 @@ body {
 }
 
 #clock-date {
-  font-size: 16px;
-  letter-spacing: 3px;
-  margin-top: 6px;
+  font-size: 20px;
+  letter-spacing: 4px;
+  margin-top: 8px;
   opacity: 0.7;
 }
 
@@ -390,9 +398,18 @@ body {
 
 @media screen and (min-width: 800px) {
   #clock-display {
-    font-size: 110px;
+    font-size: 160px;
+    letter-spacing: 8px;
   }
   #clock-seconds-wrap {
-    font-size: 52px;
+    font-size: 76px;
+    top: 12px;
+  }
+  #clock-ampm {
+    font-size: 36px;
+  }
+  #clock-date {
+    font-size: 22px;
+    letter-spacing: 6px;
   }
 }
