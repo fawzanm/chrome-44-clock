@@ -134,6 +134,19 @@
   }
 
   /* --------------------------------------------------------
+     DUBAI TIME HELPER
+     Returns a Date object whose local-time fields (getHours,
+     getDate, etc.) reflect Asia/Dubai (UTC+4), regardless of
+     the device's actual timezone. All clock display and prayer
+     comparisons use this instead of raw new Date().
+     -------------------------------------------------------- */
+  function dubaiNow() {
+    var now = new Date();
+    var utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+    return new Date(utcMs + APP.tz * 3600000);
+  }
+
+  /* --------------------------------------------------------
      HELPERS
      -------------------------------------------------------- */
   function pad2(n) {
@@ -585,7 +598,7 @@
      -------------------------------------------------------- */
   function recalcPrayers() {
     try {
-      var now = new Date();
+      var now = dubaiNow();
       // Compute for today
       APP.state.todayTimes = computePrayerTimes(now);
 
@@ -733,7 +746,7 @@
      -------------------------------------------------------- */
   function tick() {
     try {
-      var now = new Date();
+      var now = dubaiNow();
 
       // Check if date changed → recalculate
       var todayStr = toDateStr(now);
