@@ -43,20 +43,43 @@
 
   /* --------------------------------------------------------
      PRAYER CALCULATION METHODS
-     Angles: fajrAngle, ishaAngle, ishaMinutes (if used),
-             maghribMinutes (minutes after sunset, usually 0)
+     fajr/isha: sun depression angles in degrees
+     ishaMin:   if > 0, isha = maghrib + this many minutes
+                (overrides isha angle)
+     offsets:   GAIAE precautionary minute adjustments
+                { fajr, sunrise, dhuhr, asr, maghrib, isha }
      -------------------------------------------------------- */
   APP.methods = {
-    'dubai':   { name: 'Dubai (GIAE)',         fajr: 18.2, isha: 18.2, maghribMin: 0, ishaMin: 0 },
-    'mwl':     { name: 'Muslim World League',  fajr: 18,   isha: 17,   maghribMin: 0, ishaMin: 0 },
-    'isna':    { name: 'ISNA',                 fajr: 15,   isha: 15,   maghribMin: 0, ishaMin: 0 },
-    'egypt':   { name: 'Egyptian Authority',   fajr: 19.5, isha: 17.5, maghribMin: 0, ishaMin: 0 },
-    'karachi': { name: 'Karachi',              fajr: 18,   isha: 18,   maghribMin: 0, ishaMin: 0 }
+    'dubai': {
+      name: 'Dubai (GAIAE)', fajr: 18.2, isha: 18.2, ishaMin: 0,
+      offsets: { fajr: 1, sunrise: -2, dhuhr: 3, asr: 2, maghrib: 4, isha: 0 }
+    },
+    'mwl': {
+      name: 'Muslim World League', fajr: 18, isha: 17, ishaMin: 0,
+      offsets: null
+    },
+    'isna': {
+      name: 'ISNA', fajr: 15, isha: 15, ishaMin: 0,
+      offsets: null
+    },
+    'egypt': {
+      name: 'Egyptian Authority', fajr: 19.5, isha: 17.5, ishaMin: 0,
+      offsets: null
+    },
+    'makkah': {
+      name: 'Umm al-Qura (Makkah)', fajr: 18.5, isha: 0, ishaMin: 90,
+      offsets: null
+    },
+    'karachi': {
+      name: 'Karachi', fajr: 18, isha: 18, ishaMin: 0,
+      offsets: null
+    }
   };
 
-  /* Default Dubai coordinates */
+  /* Default Dubai coordinates.
+     lon 55.414 is the GAIAE reference meridian for official UAE times. */
   APP.lat = 25.2048;
-  APP.lon = 55.2708;
+  APP.lon = 55.414;
   APP.tz  = 4; // UTC+4, no DST
 
   /* --------------------------------------------------------
@@ -197,24 +220,25 @@
     return { declination: decl, equation: eqt };
   }
 
-  /* Compute the time (in hours) for a given angle below horizon */
-  function computeTime(angle, decl, lat) {
-    var part = (-sin(angle) - sin(decl) * sin(lat)) / (cos(decl) * cos(lat));
+  /* Hour angle for sun at given altitude angle (degrees).
+     Negative angle = below horizon (e.g. -18.2 for Fajr/Isha).
+     Returns hour angle in hours.
+     cos(HA) = (sin(angle) - sin(lat)*sin(decl)) / (cos(lat)*cos(decl)) */
+  function hourAngle(angle, decl, lat) {
+    var cosHA = (sin(angle) - sin(lat) * sin(decl)) / (cos(lat) * cos(decl));
     // Clamp to [-1, 1] to avoid NaN at extreme latitudes
-    if (part > 1) part = 1;
-    if (part < -1) part = -1;
-    return acos(part) / 15;
-  }
-
-  /* Mid-day (Dhuhr) time */
-  function midDay(eqt, lon, tz) {
-    return fixHour(12 - eqt - lon / 15 + tz);
+    if (cosHA > 1) cosHA = 1;
+    if (cosHA < -1) cosHA = -1;
+    return acos(cosHA) / 15;
   }
 
   /* --------------------------------------------------------
      computePrayerTimes(dateObj)
-     Returns object: { fajr, sunrise, dhuhr, asr, maghrib, isha }
-     Each value is a Date object.
+     Computes sun position at each prayer's approximate time
+     for accuracy (iterative, PrayTimes.org style).
+     Applies GAIAE precautionary offsets when method has them.
+     Returns { fajr, sunrise, dhuhr, asr, maghrib, isha }
+     as Date objects.
      -------------------------------------------------------- */
   function computePrayerTimes(dateObj) {
     var year  = dateObj.getFullYear();
@@ -227,43 +251,106 @@
     var tz  = APP.tz;
 
     var jd = julianDate(year, month, day);
-    var sun = sunPosition(jd + 0.5); // noon
-    var decl = sun.declination;
-    var eqt  = sun.equation;
 
-    // Dhuhr
-    var dhuhrH = midDay(eqt, lon, tz);
-
-    // Sunrise & Sunset (0.833 deg = apparent sun radius + refraction)
-    var sunriseOffset = computeTime(0.833, decl, lat);
-    var sunriseH = dhuhrH - sunriseOffset;
-    var sunsetH  = dhuhrH + sunriseOffset;
-
-    // Fajr
-    var fajrOffset = computeTime(method.fajr, decl, lat);
-    var fajrH = dhuhrH - fajrOffset;
-
-    // Isha
-    var ishaH;
-    if (method.ishaMin > 0) {
-      ishaH = sunsetH + method.ishaMin / 60;
-    } else {
-      var ishaOffset = computeTime(method.isha, decl, lat);
-      ishaH = dhuhrH + ishaOffset;
+    /* sunAt(fracDay) — get sun position at fractional day offset */
+    function sunAt(t) {
+      return sunPosition(jd + t);
     }
 
-    // Maghrib
-    var maghribH = sunsetH + method.maghribMin / 60;
+    /* Solar noon at fractional day t.
+       dhuhr = 12 + timezone - longitude/15 - EqT */
+    function solarNoon(t) {
+      var sun = sunAt(t);
+      return fixHour(12 + tz - lon / 15 - sun.equation);
+    }
 
-    // Asr — shadow-length formula
+    /* Time for sun at altitude 'angle' degrees (negative = below horizon).
+       ccw=true → before noon, ccw=false → after noon */
+    function timeForAngle(angle, t, ccw) {
+      var sun = sunAt(t);
+      var ha = hourAngle(angle, sun.declination, lat);
+      var noon = solarNoon(t);
+      return noon + (ccw ? -ha : ha);
+    }
+
+    /* Asr time at fractional day t.
+       asrAngle = acot(factor + tan(|lat - decl|))
+       acot(x) = atan2(1, x) — safe for all x */
+    function asrTime(factor, t) {
+      var sun = sunAt(t);
+      var decl = sun.declination;
+      var noon = solarNoon(t);
+      var asrAlt = DEG * Math.atan2(1, factor + Math.tan(Math.abs(lat - decl) * RAD));
+      var ha = hourAngle(asrAlt, decl, lat);
+      return noon + ha;
+    }
+
+    /* Initial estimates (fraction of day) */
+    var times = {
+      fajr:    5  / 24,
+      sunrise: 6  / 24,
+      dhuhr:   12 / 24,
+      asr:     13 / 24,
+      sunset:  18 / 24,
+      isha:    18 / 24
+    };
+
     var asrFactor = (APP.state.asrMethod === 'hanafi') ? 2 : 1;
-    var asrA = Math.atan(1.0 / (asrFactor + Math.tan((lat - decl) * RAD)));
-    var asrCosH = (Math.sin(asrA) - Math.sin(lat * RAD) * Math.sin(decl * RAD)) /
-                  (Math.cos(lat * RAD) * Math.cos(decl * RAD));
-    if (asrCosH > 1) asrCosH = 1;
-    if (asrCosH < -1) asrCosH = -1;
-    var asrOffset = DEG * Math.acos(asrCosH) / 15;
-    var asrH = dhuhrH + asrOffset;
+
+    /* Iterate twice for convergence */
+    var iter;
+    for (iter = 0; iter < 2; iter++) {
+      times.fajr    = timeForAngle(-method.fajr, times.fajr, true);
+      times.sunrise = timeForAngle(-0.833, times.sunrise, true);
+      times.dhuhr   = solarNoon(times.dhuhr);
+      times.asr     = asrTime(asrFactor, times.asr);
+      times.sunset  = timeForAngle(-0.833, times.sunset, false);
+
+      if (method.ishaMin > 0) {
+        times.isha = times.sunset + method.ishaMin / 60;
+      } else {
+        times.isha = timeForAngle(-method.isha, times.isha, false);
+      }
+
+      // Normalise to fractions for next iteration
+      times.fajr    = times.fajr    / 24;
+      times.sunrise = times.sunrise / 24;
+      times.dhuhr   = times.dhuhr   / 24;
+      times.asr     = times.asr     / 24;
+      times.sunset  = times.sunset  / 24;
+      times.isha    = times.isha    / 24;
+    }
+
+    // Final pass (returns hours)
+    times.fajr    = timeForAngle(-method.fajr, times.fajr, true);
+    times.sunrise = timeForAngle(-0.833, times.sunrise, true);
+    times.dhuhr   = solarNoon(times.dhuhr);
+    times.asr     = asrTime(asrFactor, times.asr);
+    times.sunset  = timeForAngle(-0.833, times.sunset, false);
+
+    if (method.ishaMin > 0) {
+      times.isha = times.sunset + method.ishaMin / 60;
+    } else {
+      times.isha = timeForAngle(-method.isha, times.isha, false);
+    }
+
+    // Maghrib = sunset (same astronomical event)
+    times.maghrib = times.sunset;
+
+    /* --------------------------------------------------
+       Apply GAIAE precautionary offsets (in minutes)
+       These shift raw astronomical times to match UAE
+       official published prayer times.
+       -------------------------------------------------- */
+    var off = method.offsets;
+    if (off) {
+      times.fajr    += off.fajr    / 60;
+      times.sunrise += off.sunrise / 60;
+      times.dhuhr   += off.dhuhr   / 60;
+      times.asr     += off.asr     / 60;
+      times.maghrib += off.maghrib / 60;
+      times.isha    += off.isha    / 60;
+    }
 
     // Convert hours to Date objects
     function hoursToDate(h) {
@@ -271,17 +358,16 @@
       var totalMin = Math.round(h * 60);
       var hh = Math.floor(totalMin / 60) % 24;
       var mm = totalMin % 60;
-      var d = new Date(year, month - 1, day, hh, mm, 0, 0);
-      return d;
+      return new Date(year, month - 1, day, hh, mm, 0, 0);
     }
 
     return {
-      fajr:    hoursToDate(fajrH),
-      sunrise: hoursToDate(sunriseH),
-      dhuhr:   hoursToDate(dhuhrH),
-      asr:     hoursToDate(asrH),
-      maghrib: hoursToDate(maghribH),
-      isha:    hoursToDate(ishaH)
+      fajr:    hoursToDate(times.fajr),
+      sunrise: hoursToDate(times.sunrise),
+      dhuhr:   hoursToDate(times.dhuhr),
+      asr:     hoursToDate(times.asr),
+      maghrib: hoursToDate(times.maghrib),
+      isha:    hoursToDate(times.isha)
     };
   }
 
