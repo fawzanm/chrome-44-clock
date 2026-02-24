@@ -334,7 +334,8 @@ body {
   opacity: 0.6;
 }
 
-.setting-row select {
+.setting-row select,
+.setting-row input[type="text"] {
   width: 100%;
   padding: 6px 8px;
   background: #1a1a24;
@@ -344,6 +345,9 @@ body {
   font-size: 13px;
   border-radius: 3px;
   outline: none;
+}
+
+.setting-row select {
   -webkit-appearance: menulist;
 }
 

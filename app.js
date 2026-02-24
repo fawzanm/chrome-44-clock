@@ -468,6 +468,13 @@
       btns[j].style.borderColor = dim;
     }
 
+    // Settings inputs & selects
+    var inputs = document.querySelectorAll('#settings-modal select, #settings-modal input[type="text"]');
+    for (var k = 0; k < inputs.length; k++) {
+      inputs[k].style.color = glow;
+      inputs[k].style.borderColor = dim;
+    }
+
     // Settings modal heading
     var h2 = document.querySelector('#settings-modal h2');
     if (h2) {
