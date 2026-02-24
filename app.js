@@ -85,7 +85,7 @@
      lon 55.414 is the GAIAE reference meridian for official UAE times. */
   APP.lat = 25.2048;
   APP.lon = 55.414;
-  APP.tz  = 4; // UTC+4, no DST
+  APP.tz  = -(new Date().getTimezoneOffset()) / 60; // system timezone offset in hours
 
   /* --------------------------------------------------------
      PRAYER NAMES (order matters)
@@ -134,16 +134,11 @@
   }
 
   /* --------------------------------------------------------
-     DUBAI TIME HELPER
-     Returns a Date object whose local-time fields (getHours,
-     getDate, etc.) reflect Asia/Dubai (UTC+4), regardless of
-     the device's actual timezone. All clock display and prayer
-     comparisons use this instead of raw new Date().
+     LOCAL TIME HELPER
+     Returns the current local time using the system timezone.
      -------------------------------------------------------- */
-  function dubaiNow() {
-    var now = new Date();
-    var utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
-    return new Date(utcMs + APP.tz * 3600000);
+  function localNow() {
+    return new Date();
   }
 
   /* --------------------------------------------------------
@@ -598,7 +593,7 @@
      -------------------------------------------------------- */
   function recalcPrayers() {
     try {
-      var now = dubaiNow();
+      var now = localNow();
       // Compute for today
       APP.state.todayTimes = computePrayerTimes(now);
 
@@ -746,7 +741,7 @@
      -------------------------------------------------------- */
   function tick() {
     try {
-      var now = dubaiNow();
+      var now = localNow();
 
       // Check if date changed → recalculate
       var todayStr = toDateStr(now);
