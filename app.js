@@ -125,6 +125,8 @@
     APP.dom.setTheme     = $('set-theme');
     APP.dom.setFormat    = $('set-format');
     APP.dom.setSeconds   = $('set-seconds');
+    APP.dom.setLat       = $('set-lat');
+    APP.dom.setLon       = $('set-lon');
     APP.dom.setMethod    = $('set-method');
     APP.dom.setAsr       = $('set-asr');
     APP.dom.errorBar     = $('error-bar');
@@ -699,10 +701,13 @@
         if (typeof s.showSeconds !== 'undefined') APP.state.showSeconds = !!s.showSeconds;
         if (s.method)   APP.state.prayerMethod = s.method;
         if (s.asr)      APP.state.asrMethod = s.asr;
+        if (typeof s.lat === 'number' && !isNaN(s.lat)) APP.lat = s.lat;
+        if (typeof s.lon === 'number' && !isNaN(s.lon)) APP.lon = s.lon;
       }
     } catch (e) {
       // ignore
     }
+    APP.tz = -(new Date().getTimezoneOffset()) / 60;
   }
 
   function saveSettings() {
@@ -712,7 +717,9 @@
         format: APP.state.format24 ? '24' : '12',
         showSeconds: APP.state.showSeconds,
         method: APP.state.prayerMethod,
-        asr: APP.state.asrMethod
+        asr: APP.state.asrMethod,
+        lat: APP.lat,
+        lon: APP.lon
       };
       localStorage.setItem('retro_dash_settings', JSON.stringify(data));
     } catch (e) {
@@ -724,6 +731,8 @@
     APP.dom.setTheme.value   = APP.state.theme;
     APP.dom.setFormat.value  = APP.state.format24 ? '24' : '12';
     APP.dom.setSeconds.value = APP.state.showSeconds ? '1' : '0';
+    APP.dom.setLat.value     = APP.lat;
+    APP.dom.setLon.value     = APP.lon;
     APP.dom.setMethod.value  = APP.state.prayerMethod;
     APP.dom.setAsr.value     = APP.state.asrMethod;
   }
@@ -732,6 +741,11 @@
     APP.state.theme        = APP.dom.setTheme.value;
     APP.state.format24     = (APP.dom.setFormat.value === '24');
     APP.state.showSeconds  = (APP.dom.setSeconds.value === '1');
+    var parsedLat = parseFloat(APP.dom.setLat.value);
+    var parsedLon = parseFloat(APP.dom.setLon.value);
+    APP.lat = isNaN(parsedLat) ? 25.2048 : parsedLat;
+    APP.lon = isNaN(parsedLon) ? 55.414  : parsedLon;
+    APP.tz  = -(new Date().getTimezoneOffset()) / 60;
     APP.state.prayerMethod = APP.dom.setMethod.value;
     APP.state.asrMethod    = APP.dom.setAsr.value;
   }
@@ -791,7 +805,7 @@
 
     // Settings change listeners (apply immediately)
     var settingEls = [APP.dom.setTheme, APP.dom.setFormat, APP.dom.setSeconds,
-                      APP.dom.setMethod, APP.dom.setAsr];
+                      APP.dom.setLat, APP.dom.setLon, APP.dom.setMethod, APP.dom.setAsr];
     for (var i = 0; i < settingEls.length; i++) {
       settingEls[i].addEventListener('change', function () {
         readSettingsFromUI();
